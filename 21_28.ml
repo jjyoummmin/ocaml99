@@ -64,3 +64,39 @@ let permutation l =
   |h::t -> let rand = Random.int (List.length acc + 1) in
            loop t (insert_nth h rand acc)
   in loop l [] ;;  
+
+(* 26 - combination *)
+  
+let extract n l=
+  let f a l = List.map (fun x -> a::x) l in
+  let rec comb k = function
+  |[] -> []
+  |h::t as l -> if k=1 then List.map (fun x -> [x]) l
+                else f h (comb (k-1) t) @ (comb k t) in
+  comb n l;;   
+  
+(* 27 *)
+(* for example, one [1;2;3] => [([1], [2; 3]); ([2], [1; 3]); ([3], [1; 2])] *)
+let one l =  
+  let rec part front acc = function
+    |[]->List.rev acc
+    |h::t -> part (front@[h]) (([h], front@t)::acc) t 
+  in part [] [] l;;  
+  
+(* extract function result => (picked list , rest list) list *)
+let extract n l = 
+  let rec comb k = function
+  |[] -> []
+  |h::t as l -> if k=1 then one l
+                else let l1 = List.map (fun (p,r) -> (h::p, r))  (comb (k-1) t) in    (* 1. add h to picked list*)
+                     let l2 = List.map (fun (p,r) -> (p, h::r)) (comb k t) in         (* 2. add h to rest list*)     
+                       l1@l2                                                            (* concat 1 and 2 *)  
+  in comb n l;;
+  
+  
+let rec group l = function
+  |[] -> failwith "invalid"
+  |[x] -> List.map (fun (p,r) -> [p]) (extract x l)
+  |h::t -> List.fold_left (fun acc (p, r) -> 
+           let l' = List.map (fun x -> p::x ) (group r t) in acc@l' ) [] (extract h l);; 
+  
