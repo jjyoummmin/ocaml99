@@ -99,4 +99,26 @@ let rec group l = function
   |[x] -> List.map (fun (p,r) -> [p]) (extract x l)
   |h::t -> List.fold_left (fun acc (p, r) -> 
            let l' = List.map (fun x -> p::x ) (group r t) in acc@l' ) [] (extract h l);; 
+
+(* 28 *)
+(* fst (a,b) => a  ,     snd (a,b) => b *)
+
+(* length_sort *)
+let length_sort l = 
+  let l' = List.map (fun x-> (x, List.length x)) l in
+  let sorted = List.sort (fun (_,a) (_,b) -> Pervasives.compare a b) l' in
+  List.map fst sorted;; 
+
+(* frequency_sort *)
+let rec add len x = function
+|[]-> [(len, 1), [x]]
+|((a,num),b) as h::t -> if a=len then ((a,num+1),x::b)::t else h::add len x t;;
+
+let frequency_sort l = 
+  let l' = List.fold_left (fun acc x -> 
+            let len = List.length x in add len x acc ) [] l in 
+  let sorted = List.sort (fun ((_,a),_) ((_,b),_) -> Pervasives.compare a b) l' in
+  List.concat (List.map (fun x -> List.rev (snd x)) sorted);; 
+
+           
   
